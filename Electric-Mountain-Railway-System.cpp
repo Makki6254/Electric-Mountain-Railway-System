@@ -17,6 +17,16 @@ struct Train {
     int revenue;
 };
 
+struct Ticket {
+    string customerName;
+    string phoneNumber;
+    int numPassengers;
+    int totalPrice;
+    int discount;
+    string trainUp;
+    string trainDown;
+};
+
 vector<Train> trains;
 
 void init_trains() {
@@ -29,7 +39,6 @@ void init_trains() {
     trains.push_back({"D3", 1400, NUM_COACHES * NUM_SEATS, 0, 0});
     trains.push_back({"D4", 1600, (NUM_COACHES + 2) * NUM_SEATS, 0, 0});
 }
-
 
 void display_screen() {
     cout << "\t\t\t\tWelcome to the Electric Mountain Railway System\n";
@@ -67,16 +76,29 @@ int input_int(string prompt, int min, int max) {
             cin.ignore(1000, '\n');
         }
     } while (!valid);
-     cout << "---------------------------------------------------------------\n";
+    cout << "---------------------------------------------------------------\n";
+    return value;
+}
+
+string input_string(string prompt) {
+    string value;
+    cout << prompt;
+    cin.ignore();  // Clear the newline left in the buffer
+    getline(cin, value);
     return value;
 }
 
 void purchase_tickets() {
     int up_index, down_index;
     int num_passengers;
+    string customerName;
+    string phoneNumber;
     int total_price, discount;
     char confirm;
     bool valid;
+
+    customerName = input_string("Enter your name: ");
+    phoneNumber = input_string("Enter your phone number: ");
 
     cout << "Please choose a train for the journey up the mountain.\n";
     cout << "Enter the train number (1-4) or 0 to cancel: ";
@@ -84,7 +106,7 @@ void purchase_tickets() {
 
     if (up_index == -1) {
         cout << "You have cancelled the purchase.\n";
-         cout << "---------------------------------------------------------------\n";
+        cout << "---------------------------------------------------------------\n";
         return;
     }
 
@@ -117,7 +139,7 @@ void purchase_tickets() {
 
     if (num_passengers > trains[up_index].available || num_passengers > trains[down_index].available) {
         cout << "Sorry, there are not enough seats available for the number of passengers you entered.\n";
-         cout << "---------------------------------------------------------------\n";
+        cout << "---------------------------------------------------------------\n";
         return;
     }
 
@@ -142,7 +164,7 @@ void purchase_tickets() {
     if (discount > 0) {
         cout << "You have received a discount of $" << discount << "\n";
     }
-     cout << "---------------------------------------------------------------\n";
+    cout << "---------------------------------------------------------------\n";
     cout << "Do you want to confirm the purchase? (Y/N): ";
     do {
         cin >> confirm;
@@ -164,12 +186,31 @@ void purchase_tickets() {
         trains[down_index].available -= num_passengers;
         trains[down_index].passengers += num_passengers;
         trains[down_index].revenue += num_passengers * TICKET_PRICE;
+
+        // Create a ticket slip
+        Ticket ticket = {customerName, phoneNumber, num_passengers, total_price, discount, trains[up_index].id, trains[down_index].id};
+        
+        // Display the ticket slip
+        cout << "\n--------------------- Ticket Slip ---------------------\n";
+        cout << "Customer Name: " << ticket.customerName << "\n";
+        cout << "Phone Number: " << ticket.phoneNumber << "\n";
+        cout << "Train for the journey up: " << ticket.trainUp << " at " << setw(2) << setfill('0') << trains[up_index].time / 100 << ":";
+        cout << setw(2) << setfill('0') << trains[up_index].time % 100 << "\n";
+        cout << "Train for the journey down: " << ticket.trainDown << " at " << setw(2) << setfill('0') << trains[down_index].time / 100 << ":";
+        cout << setw(2) << setfill('0') << trains[down_index].time % 100 << "\n";
+        cout << "Number of Passengers: " << ticket.numPassengers << "\n";
+        cout << "Total Price: $" << ticket.totalPrice << "\n";
+        if (ticket.discount > 0) {
+            cout << "Discount Received: $" << ticket.discount << "\n";
+        }
+        cout << "-------------------------------------------------------\n";
+
         cout << "You have successfully purchased the tickets. Thank you for choosing the Electric Mountain Railway System.\n";
     }
     else {
         cout << "You have cancelled the purchase.\n";
     }
-     cout << "---------------------------------------------------------------\n";
+    cout << "---------------------------------------------------------------\n";
 }
 
 void display_report() {
@@ -219,27 +260,27 @@ int main() {
 
         switch (choice) {
             case 1:
-                 cout << "---------------------------------------------------------------\n";
+                cout << "---------------------------------------------------------------\n";
                 purchase_tickets();
-                 cout << "---------------------------------------------------------------\n";
+                cout << "---------------------------------------------------------------\n";
                 break;
             case 2:
                 display_report();
                 break;
             case 3:
                 exit = true;
-                 cout << "---------------------------------------------------------------\n";
+                cout << "---------------------------------------------------------------\n";
                 cout << "\nThank you for using the Electric Mountain Railway System.\n";
-                 cout << "---------------------------------------------------------------\n";
+                cout << "---------------------------------------------------------------\n";
                 break;
             default:
                 exit = false;
-                 cout << "---------------------------------------------------------------\n";
+                cout << "---------------------------------------------------------------\n";
                 cout << "Invalid choice. Please try again.\n";
-                 cout << "---------------------------------------------------------------\n";
+                cout << "---------------------------------------------------------------\n";
                 break;
         }
     } while (!exit);
- cout << "---------------------------------------------------------------\n";
+    cout << "---------------------------------------------------------------\n";
     return 0;
 }
